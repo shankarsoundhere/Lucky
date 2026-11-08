@@ -208,6 +208,7 @@ function $(id){
 function showError(message){
  $("loadingArea").classList.add("hidden");
  $("quizArea").classList.add("hidden");
+ $("resultArea").classList.add("hidden");
  $("errorArea").classList.remove("hidden");
  $("errorArea").innerHTML="";
  const box=document.createElement("div");
@@ -256,11 +257,17 @@ async function init(){
   loadProgress();
 
   $("loadingArea").classList.add("hidden");
-  $("quizArea").classList.remove("hidden");
 
-  render();
-  updateTimer();
-  tick=setInterval(updateTimer,1000);
+  if(finished){
+   // पहले से Submit Quiz को Result स्क्रीन पर खोलें।
+   finished=false;
+   finish();
+  }else{
+   $("quizArea").classList.remove("hidden");
+   render();
+   updateTimer();
+   tick=setInterval(updateTimer,1000);
+  }
 
  }catch(error){
   showError("क्विज लोड नहीं हो पाया।\n"+error.message);
@@ -273,7 +280,8 @@ function save(){
  try{
   localStorage.setItem(storageKey,JSON.stringify({
    answers,marked,current,endTime,
-   questionCount:questions.length
+   questionCount:questions.length,
+   finished:false
   }));
   $("saveStatus").textContent="✓ उत्तर सेव हो गए";
  }catch(e){
@@ -315,6 +323,9 @@ function loadProgress(){
    ?Math.max(0,Math.min(data.current,questions.length-1)):0;
 
   endTime=Number(data.endTime)||Date.now()+duration*60*1000;
+
+  // Submit की स्थिति भी Restore करें।
+  finished=data.finished===true;
 
  }catch(e){
   localStorage.removeItem(storageKey);
@@ -376,6 +387,7 @@ function render(){
   if(i===current)button.classList.add("current");
 
   button.onclick=()=>{
+   if(finished)return;
    current=i;
    save();
    render();
@@ -386,6 +398,7 @@ function render(){
 }
 
 function next(){
+ if(finished)return;
  if(current<questions.length-1){
   current++;
   save();
@@ -394,6 +407,7 @@ function next(){
 }
 
 function previous(){
+ if(finished)return;
  if(current>0){
   current--;
   save();
@@ -402,6 +416,7 @@ function previous(){
 }
 
 function toggleReview(){
+ if(finished)return;
  marked[current]=!marked[current];
  save();
  render();
@@ -418,6 +433,17 @@ function finish(){
 
  finished=true;
  clearInterval(tick);
+
+ // Submit होते ही पूरा Result और उत्तर स्थायी रूप से सेव करें।
+ try{
+  localStorage.setItem(storageKey,JSON.stringify({
+   answers,marked,current,endTime,
+   questionCount:questions.length,
+   finished:true
+  }));
+ }catch(e){
+  alert("Result सेव नहीं हो पाया। कृपया फोन में Storage उपलब्धता जांचें।");
+ }
 
  let correct=0,wrong=0,skip=0;
 
@@ -470,9 +496,6 @@ function finish(){
  });
 
  renderReview();
-
- // Submit के बाद उत्तर और रिजल्ट इसी स्क्रीन पर बने रहेंगे।
- // Restart करने पर ही पुराना प्रयास हटेगा।
 }
 
 function renderReview(){
