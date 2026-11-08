@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Quiz Sets | Quiz Master</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f3f6fb;
+ color:#17243a;
+ font-family:Arial,sans-serif;
+}
+header{
+ background:linear-gradient(135deg,#102b50,#2465a5);
+ color:white;
+ padding:24px 17px;
+ border-radius:0 0 22px 22px;
+}
+header small{color:#c8dcf5;letter-spacing:2px}
+header h2{font-size:22px;margin:12px 0 5px}
+header p{font-size:13px;color:#dceaff;margin:0}
+main{max-width:600px;margin:20px auto;padding:0 14px}
+.card{
+ background:white;
+ border-radius:15px;
+ padding:17px;
+ margin-bottom:14px;
+ box-shadow:0 3px 15px #17243a0b;
+}
+.chapter-title{font-size:18px;margin:0 0 6px}
+.sub{font-size:13px;color:#718096;margin:0}
+.set{
+ display:flex;
+ align-items:center;
+ gap:13px;
+ padding:15px 12px;
+ border:1px solid #e2e8f0;
+ border-radius:12px;
+ margin-top:12px;
+ text-decoration:none;
+ color:#17243a;
+ transition:.2s;
+}
+.set:active{transform:scale(.98);background:#f0f6ff}
+.number{
+ width:43px;
+ height:43px;
+ flex-shrink:0;
+ border-radius:11px;
+ background:#eaf3ff;
+ color:#2169ad;
+ display:grid;
+ place-items:center;
+ font-size:17px;
+ font-weight:bold;
+}
+.info{flex:1}
+.info b{display:block;font-size:15px}
+.info small{display:block;color:#718096;margin-top:5px;font-size:12px}
+.arrow{font-size:23px;color:#8a9bb0}
+.back{
+ display:inline-block;
+ text-decoration:none;
+ color:#2169ad;
+ font-size:14px;
+ font-weight:bold;
+ margin-bottom:14px;
+}
+.footer{text-align:center;color:#8a96a8;font-size:12px;padding:15px}
+</style>
+</head>
+
+<body>
+
+<header>
+<small>LEARN • PRACTICE • ACHIEVE</small>
+<h2 id="subjectTitle">Quiz Master</h2>
+<p id="chapterSubtitle">Chapter Quiz Practice</p>
+</header>
+
+<main>
+
+<a class="back" href="index.html">← मुख्य पेज पर जाएँ</a>
+
+<div class="card">
+<h3 class="chapter-title" id="chapterTitle">Chapter 1</h3>
+<p class="sub">अपना Quiz Set चुनें और अभ्यास शुरू करें।</p>
+</div>
+
+<div class="card" id="sets"></div>
+
+<div class="footer">QUIZ MASTER • PRACTICE EVERY DAY</div>
+
+</main>
+
+<script>
+const params=new URLSearchParams(location.search);
+
+const subject=(params.get("subject")||"geography").toLowerCase();
+const chapter=params.get("chapter")||"1";
+
+const subjectNames={
+ geography:"भूगोल",
+ history:"इतिहास",
+ economics:"अर्थशास्त्र",
+ "political-science":"राजनीति विज्ञान",
+ "disaster-management":"आपदा प्रबंधन",
+ physics:"भौतिक विज्ञान",
+ chemistry:"रसायन विज्ञान",
+ biology:"जीव विज्ञान",
+ "gadya-bhag":"गद्य भाग",
+ "padya-bhag":"पद्य भाग",
+ "hindi-bhag-2":"हिंदी भाग 2",
+ sanskrit:"संस्कृत"
+};
+
+const chapterNames={
+ geography:{
+  1:"भारत : संसाधन एवं उपयोग",
+  2:"कृषि",
+  3:"निर्माण उद्योग",
+  4:"परिवहन, संचार एवं व्यापार",
+  5:"बिहार : कृषि एवं वन संसाधन",
+  6:"बिहार : उद्योग एवं परिवहन"
+ },
+ history:{
+  1:"यूरोप में राष्ट्रवाद",
+  2:"समाजवाद एवं साम्यवाद",
+  3:"हिंद चीन में राष्ट्रवादी आंदोलन",
+  4:"भारत में राष्ट्रवाद",
+  5:"अर्थव्यवस्था और आजीविका",
+  6:"शहरीकरण एवं शहरी जीवन"
+ }
+};
+
+const subjectName=subjectNames[subject]||subject;
+const chapterName=chapterNames[subject]?.[chapter]||`Chapter ${chapter}`;
+
+document.title=chapterName+" | Quiz Master";
+document.getElementById("subjectTitle").textContent=subjectName+" Quiz";
+document.getElementById("chapterSubtitle").textContent=
+ chapterName+" | Quiz Practice";
+document.getElementById("chapterTitle").textContent=
+ "Chapter "+chapter+" : "+chapterName;
+
+const sets=document.getElementById("sets");
+
+for(let i=1;i<=5;i++){
+ const link=document.createElement("a");
+ link.className="set";
+ link.href=`quiz.html?subject=${encodeURIComponent(subject)}&chapter=${encodeURIComponent(chapter)}&set=${i}`;
+
+ const number=document.createElement("div");
+ number.className="number";
+ number.textContent=String(i).padStart(2,"0");
+
+ const info=document.createElement("div");
+ info.className="info";
+
+ const title=document.createElement("b");
+ title.textContent="Quiz Set "+i;
+
+ const detail=document.createElement("small");
+ detail.textContent="प्रश्न अभ्यास करें";
+
+ info.append(title,detail);
+
+ const arrow=document.createElement("span");
+ arrow.className="arrow";
+ arrow.textContent="›";
+
+ link.append(number,info,arrow);
+ sets.appendChild(link);
+}
+</script>
+
+</body>
+</html>
